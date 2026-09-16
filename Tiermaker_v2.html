@@ -6227,12 +6227,16 @@ function spinWheel() {
 
     const sliceDeg = 360 / items.length;
     const winnerIndex = Math.floor(Math.random() * items.length);
-    // المؤشر في الأعلى (0 درجة). نريد أن تتوقف منتصف قطعة الفائز عند الأعلى.
+    // القطع تُرسم بدءاً من 0° (اليمين/الساعة 3) وتزيد باتجاه عقارب الساعة،
+    // لكن المؤشر الفعلي موجود أعلى العجلة (الساعة 12)، وهذا يعادل 270° بنفس نظام قياس الرسم.
+    // لازم نحسب الدوران عشان مركز قطعة الفائز يوصل بالضبط تحت المؤشر (270°) مو عند 0°.
+    const POINTER_ANGLE = 270;
     const targetSliceCenter = winnerIndex * sliceDeg + sliceDeg / 2;
+    const requiredOffset = ((POINTER_ANGLE - targetSliceCenter) % 360 + 360) % 360;
     const randomJitter = (Math.random() - 0.5) * (sliceDeg * 0.6);
     const extraTurns = 6 + Math.floor(Math.random() * 3); // 6-8 لفات كاملة
     const startRotation = wheelCurrentRotation;
-    const finalRotation = startRotation + extraTurns * 360 + (360 - targetSliceCenter) - (startRotation % 360) + randomJitter;
+    const finalRotation = startRotation + extraTurns * 360 + requiredOffset - (startRotation % 360) + randomJitter;
 
     const canvas = document.getElementById('wheelCanvas');
     let lastAngle = startRotation;
